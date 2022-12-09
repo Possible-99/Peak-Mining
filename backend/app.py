@@ -23,7 +23,148 @@ from sklearn import metrics
 
 # Every thing that we receive from the frontend should be a data_frame?
 
+#################################### EDA
 
+#return json in each function or when we have all the data in the main component function
+
+# def series_to_dataframe(series, cols_names):
+#     data_frame = series.to_frame().reset_index();
+#     data_frame.columns = cols_names
+#     return data_frame
+
+
+# def null_values(data_frame):
+#     null_table = data_frame.isnull().sum()
+#     null_table = series_to_dataframe(null_table , ["Variable" , "Null count"])
+#     return null_table
+
+
+def conver_dataframe_to_json(data_frame):
+    # Specify handler in case we have a strange object.
+    return data_frame.to_json(orient = "records", default_handler = str)
+
+def convert_to_json(data):
+    return json.dumps(data)
+
+def read_file(path):
+    return pd.read_csv(path)
+
+def series_to_dataframe(series, col_name , col_name2):
+    return pd.DataFrame({col_name : series.index , col_name2 : series.values}) 
+
+
+
+
+def data_description(data_frame):
+    #Construct dataframe with info about the table and convert to json 
+    data_description = pd.DataFrame(data_frame.columns, columns=['variables'])
+    data_description["data_type"] = data_frame.dtypes.values
+    data_description["null_count"] = data_frame.isnull().sum().values
+    return conver_dataframe_to_json(data_description)
+
+"""
+histograms(data_frame) -> returns json in this format [{column_name : "name" , rows : [{name : "" , value: ""}]}]
+"""
+def histograms(data_frame):
+    # Todo: Include the right limit, need to solve pandas interval problem.
+    # Get the histogram of each variable
+    histograms = []
+    for column in data_frame.columns:
+        data_type = data_frame.dtypes[column]
+        # Only for the ones that have numeric values
+        if(data_type == float or data_type == int):
+            # Get the range and the count of the column
+            column_hist = pd.cut(data_frame[column], 10).value_counts().sort_index()
+            column_hist = pd.DataFrame({'value':column_hist.index, 'name': column_hist.values})
+            #Get the limit of the histogram
+            column_hist['value'] = column_hist['value'].apply(lambda x: x.left)
+            ##Convert to dict , maybe create a funciton for to_dict and for formattin the dict of a col with his name.
+            column_hist = column_hist.to_dict("records")
+            histograms.append({"column_name" : column , "rows" : column_hist})
+    histograms = json.dumps(histograms)
+    return histograms
+
+
+#TODO : Maybe create a util function for reutilizing the next 3 lines
+def numerical_variables_stats(data_frame):
+    stats_frame = data_frame.describe()
+    #Added the stat name to data_frame
+    stats_frame = stats_frame.rename_axis('measure').reset_index()
+    return conver_dataframe_to_json(stats_frame)
+
+def cathegorical_variables_stats(data_frame):
+    stats_frame = data_frame.describe(include = "object")
+    #Added the stat name to data_frame
+    stats_frame = stats_frame.rename_axis('measure').reset_index()
+    return conver_dataframe_to_json(stats_frame)
+
+
+
+     
+
+def cathegorical_cols_plots_values(data_frame , unique_values = 10):
+    cols_plots_values = []
+    for col in data_frame.select_dtypes(include='object'):
+        if data_frame[col].nunique() < unique_values:
+            col_frequencies = data_frame[col].value_counts()
+            col_frequencies = series_to_dataframe(col_frequencies , "value" , "count")
+            ## Use dict function?
+            col_frequencies = col_frequencies.to_dict("records")
+            ## Use a function for creating a dict format?
+            cols_plots_values.append({"column_name": col , "rows" : col_frequencies})
+    cols_plots_values = json.dumps(cols_plots_values)
+    return cols_plots_values
+
+
+def debug(data):
+    print("==========================")
+    print(data)
+    print("==========================")
+
+
+# TODO: Make a more optimal fucntion O(n ** 2), maybe a class with preprocessing?
+def box_plot_values(data_frame):
+    q1 = data_frame.quantile(0.25)
+    median = data_frame.quantile(0.5)
+    q3 = data_frame.quantile(0.75)
+    IQR = q3 - q1 
+    Lower_Fence = q1 - (1.5 * IQR)
+    Upper_Fence = q3 + (1.5 * IQR)
+    whisker_high = max(data_frame[data_frame<Upper_Fence])
+    whisker_low = min(data_frame[data_frame>Lower_Fence])
+    outliers = list(data_frame[data_frame < whisker_low])
+    outliers.extend(list(data_frame[data_frame > whisker_high]))
+    return {"low" : whisker_low , "q1" : q1, "median" : median , "q3" : q3 , "high" : whisker_high , "outliers" : outliers }
+
+def box_plot(data_frame , atypicCols = []):
+    if(atypicCols == []):
+        atypicCols = data_frame.columns
+
+    data_frame = data_frame.dropna()
+    columns_box_plots = {}
+
+    for col in atypicCols:
+        data_type = data_frame.dtypes[col]
+        if(data_type == float or data_type == int):
+            values = box_plot_values(data_frame[col])
+            columns_box_plots[col] = values
+    
+    return convert_to_json(columns_box_plots)
+
+
+#TODO: Just get the lowe triangle part(space/time improv.)
+
+def corr_table(data_frame):
+    data_frame = data_frame.corr()
+    return data_frame
+    
+    
+def corr_heatmap_values(corr_matrix):
+    # Flatter the data frame for {row , col , value} structure
+    # Stack move the cols as rows
+    heatmap_values = corr_matrix.stack().reset_index()
+    heatmap_values.columns = ['row','col','value']
+    return heatmap_values
         
 ###################################################################### PCA
 
