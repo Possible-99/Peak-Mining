@@ -35,36 +35,36 @@ def proccess_file(request):
         return file
 
 
-@app.route("/api/eda", methods = ["GET"])
+@app.route("/api/eda", methods = ["POST"])
 def eda_analysis():
     file = proccess_file(request)
     if file: 
-
         data_frame = read_file(file)
         #Data frame
         description = general_analysis.data_description(data_frame)
         #Array
-        histograms = eda.histograms(data_frame)
+        histograms = eda.histograms_columns(data_frame)
         #Data frame
         num_var_stats= general_analysis.numerical_variables_stats(data_frame)
         #Dict
         box_plots = eda.box_plots(data_frame)
         #Frame
-        cathegorical_cols = eda.cathegorical_variables_stats(data_frame)
+        cathegorical_cols_stats = eda.cathegorical_variables_stats(data_frame)
         #Array
         cathegorical_cols_plots = eda.cathegorical_cols_plots_values(data_frame)
         #Frame
         corr_table = general_analysis.corr_table(data_frame)
         #Frame
         heat_map = general_analysis.corr_heatmap_values(corr_table)
+
         
         return {
             "table" : df_to_json(data_frame),
             "description": df_to_json(description),
-            "histograms" : histograms,
+            "histogramColumns" : histograms,
             "numVarStats": df_to_json(num_var_stats),
             "boxPlots": box_plots,
-            "cathegoricalCols" : df_to_json(cathegorical_cols),
+            "cathegoricalColsStats" : df_to_json(cathegorical_cols_stats),
             "cathegoricalColsPlots" : cathegorical_cols_plots,
             "corrTable": df_to_json(corr_table),
             "heatMap" : df_to_json(heat_map)
@@ -73,7 +73,7 @@ def eda_analysis():
     return "try later or verify file characteristics" , 400
 
     
-@app.route("/api/pca", methods = ["GET"])
+@app.route("/api/pca", methods = ["POST"])
 def pca_analyisis():
     file = proccess_file(request)
     if file:
@@ -121,11 +121,11 @@ def trees_analysis():
     algorithm = json.loads(request.form["algorithm"])
     if file and X_variables and Y_variable:
         data_frame = read_file(file)
-        description = general_analysis.data_description(data_frame)
-        scatter_values = numeric_cols(data_frame)
-        num_var_stats= general_analysis.numerical_variables_stats(data_frame)
-        corr_table = general_analysis.corr_table(data_frame)
-        heat_map = general_analysis.corr_heatmap_values(corr_table)
+        # description = general_analysis.data_description(data_frame)
+        # scatter_values = numeric_cols(data_frame)
+        # num_var_stats= general_analysis.numerical_variables_stats(data_frame)
+        # corr_table = general_analysis.corr_table(data_frame)
+        # heat_map = general_analysis.corr_heatmap_values(corr_table)
 
         # Select variables
         X = select_cols(data_frame ,X_variables)
@@ -143,17 +143,36 @@ def trees_analysis():
 
 
         return {
-            "table" : df_to_json(data_frame),
-            "description": df_to_json(description),
-            "corrTable" : df_to_json(corr_table),
-            "heatMap" : df_to_json(heat_map),
-            "scatterValues" : df_to_json(scatter_values),
-            "numVarStats" : df_to_json(num_var_stats),
             "modelStatsDecision" : dict_vals_to_json(model_stats_d),
             "modelStatsRandom" : dict_vals_to_json(model_stats_r)
         }
 
     return "try later or verify file characteristics and arguments" , 400
+
+
+
+@app.route("/api/general_analysis", methods = ["POST"])
+def general_analysis():
+    file = proccess_file(request)
+    if file:
+        data_frame = read_file(file)
+        description = general_analysis.data_description(data_frame)
+        numeric_cols= numeric_cols(data_frame).columns
+        num_var_stats= general_analysis.numerical_variables_stats(data_frame)
+        corr_table = general_analysis.corr_table(data_frame)
+        heat_map = general_analysis.corr_heatmap_values(corr_table)
+
+        return{
+            "table" : df_to_json(data_frame),
+            "description": df_to_json(description),
+            "corrTable" : df_to_json(corr_table),
+            "heatMap" : df_to_json(heat_map),
+            "numVarStats" : df_to_json(num_var_stats),
+            "numericCols": numeric_cols 
+        }
+
+    return "try later or verify file characteristics and arguments" , 400
+
 
 
 
