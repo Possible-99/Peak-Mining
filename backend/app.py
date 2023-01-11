@@ -22,8 +22,6 @@ app = Flask(__name__)
 ALLOWED_EXTENSIONS = {'txt', 'csv', 'xlx'}
 
 
-# data_frame = read_file("data/WDBCOriginal.csv")
-
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -103,18 +101,6 @@ def pca_analyisis():
         }
     return "try later or verify file characteristics" , 400
 
-    
-
-# algorithm = "classificataion"
-
-# X_variables =  ["Pregnancies","Glucose","BloodPressure","SkinThickness","Insulin","BMI","DiabetesPedigreeFunction","Age"]
-
-# Y_variable = ["Outcome"]
-
-
-
-
-
 @app.route("/api/components", methods = ["POST"])
 def trees_analysis():
     file = proccess_file(request)
@@ -124,11 +110,6 @@ def trees_analysis():
     algorithm = json.loads(request.form["algorithm"])
     if file and X_variables and Y_variable:
         data_frame = read_file(file)
-        # description = general_analysis.data_description(data_frame)
-        # scatter_values = numeric_cols(data_frame)
-        # num_var_stats= general_analysis.numerical_variables_stats(data_frame)
-        # corr_table = general_analysis.corr_table(data_frame)
-        # heat_map = general_analysis.corr_heatmap_values(corr_table)
 
         # Select variables
         X = select_cols(data_frame ,X_variables)
@@ -176,101 +157,9 @@ def general_stats():
 
     return "try later or verify file characteristics and arguments" , 400
 
-
-
-
-
-
-
-
-
-    
-
 def debug(data):
     print("==========================")
     print(data)
     print("==========================")
 
 
-# debug(eda_analysis())
-
-
-
-
-
-
-    
-    
-
-
-# print(data_description(data_frame))
-
-# histograms(data_frame)
-
-# print(numerical_variables_stats(data_frame))
-
-
-# box_plot(data_frame )
-
-# print(cathegorical_variables_stats(data_frame))
-
-
-# cathegorical_cols_plots_values(data_frame)
-
-# debug(corr_heatmap_values(corr_table(data_frame)))
-
-
-#PCA
-
-#data_decription(data_frame)
-
-# corr_table(data_frame)
-
-
-#corr_heatmap_values()
-
-#Stanarize data
-
-# table_with_num_cols = numeric_cols(data_frame) 
-# mx = standarized_matrix(table_with_num_cols) # This can also be the values for the scatter graph.
-# comp = get_components(mx)
-#components_variance_chart_val(comp)
-
-# charge_table = component_charge_table(comp , table_with_num_cols)
-
-# max_cols = get_max_cols(charge_table)
-# debug(max_cols)
-
-
-
-#AD y BA
-
-#data_description
-
-#get_scatter_values()
-
-#numerical_values_stats
-
-# corr_heatmap_values
-
-
-# Get X and Y
-# X_variables =  ['Pregnancies',
-#                                                            'Glucose',
-#                                                            'BloodPressure',
-#                                                            'SkinThickness',
-#                                                            'Insulin',
-#                                                            'BMI',
-#                                                            'DiabetesPedigreeFunction',
-#                                                            'Age']
-# X = select_cols(data_frame ,X_variables)
-
-# Y = select_cols(data_frame, ["Outcome"])
-# model = create_model(X, Y)
-
-# classification, model_stats = decision_trees(model , X_variables)
-
-# random_classification, model_stats_random = random_trees(model ,X_variables)
-
-# print(make_prediction(random_classification, {'Pregnancies': [6], 'Glucose': [148], 'BloodPressure': [72], 'SkinThickness': [35], 'Insulin': [0],'BMI': [33.6], 'DiabetesPedigreeFunction': [0.627],
-# 'Age': [50]}))
