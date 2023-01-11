@@ -3,11 +3,14 @@ import {
 	MenuFoldOutlined,
 	MenuUnfoldOutlined,
 	UploadOutlined,
+	ApartmentOutlined,
+	ExperimentFilled,
 	UserOutlined,
+	UngroupOutlined,
 	VideoCameraOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu, theme } from "antd";
-import { Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 const { Header, Sider, Content } = Layout;
 const MainLayout = ({ children }) => {
 	const [collapsed, setCollapsed] = useState(false);
@@ -33,22 +36,44 @@ const MainLayout = ({ children }) => {
 				<Menu
 					theme="dark"
 					mode="inline"
-					defaultSelectedKeys={["1"]}
+					// defaultSelectedKeys={["1"]}
 					items={[
 						{
 							key: "1",
-							icon: <UserOutlined />,
+							icon: (
+								<Link to="/dashboard">
+									<UserOutlined />
+								</Link>
+							),
 							label: "Home",
 						},
 						{
 							key: "2",
-							icon: <VideoCameraOutlined />,
+							icon: (
+								<Link to="/dashboard/eda">
+									<ExperimentFilled />
+								</Link>
+							),
 							label: "EDA",
 						},
 						{
 							key: "3",
-							icon: <UploadOutlined />,
+							icon: (
+								<Link to="/dashboard/pca">
+									{" "}
+									<UngroupOutlined />
+								</Link>
+							),
 							label: "PCA",
+						},
+						{
+							key: "4",
+							icon: (
+								<Link to="/dashboard/tree">
+									<ApartmentOutlined />
+								</Link>
+							),
+							label: "Arboles",
 						},
 					]}
 				/>

@@ -40,13 +40,13 @@ const EdaAnalysis = () => {
 						<CustomTable
 							data={data["description"]}
 							columns={colsAntdFormat(data["description"])}
-							title="Informacion general"
+							title="Información general"
 						/>
 					)}
 					{/* Put in a component? */}
 					{data["histogramColumns"].length > 0 && (
 						<>
-							<Title level={2}> Histogramas variabels numericas</Title>
+							<Title level={2}> Histogramas variables numéricas</Title>
 							<Row gutter={[70, 50]}>
 								{data["histogramColumns"].map((numericCol) => (
 									<>
@@ -68,7 +68,7 @@ const EdaAnalysis = () => {
 							<CustomTable
 								data={data["numVarStats"]}
 								columns={colsAntdFormat(data["numVarStats"])}
-								title="Estadistica Variabes Numericas"
+								title="Estadística Variables Numéricas"
 							/>
 						</>
 					)}
@@ -101,14 +101,14 @@ const EdaAnalysis = () => {
 						<CustomTable
 							data={data["cathegoricalColsStats"]}
 							columns={colsAntdFormat(data["cathegoricalColsStats"])}
-							title="Estadistica Variabes Categoricas"
+							title="Estadística Variables Categóricas"
 						/>
 					)}
 
 					{data["cathegoricalColsPlots"].length > 0 && (
 						<>
 							<Divider />
-							<Title level={2}> Graficas Variables Categoricas</Title>
+							<Title level={2}> Gráficas Variables Categóricas</Title>
 
 							<Row gutter={[70, 50]}>
 								{data["cathegoricalColsPlots"].map((cathegoricalCol) => (
@@ -136,7 +136,7 @@ const EdaAnalysis = () => {
 						<CustomTable
 							data={data["corrTable"]}
 							columns={colsAntdFormat(data["corrTable"])}
-							title="Tabla de Correlacion"
+							title="Tabla de correlación"
 						/>
 					)}
 					{data["heatMap"].length > 0 && (

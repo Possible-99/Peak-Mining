@@ -6,14 +6,18 @@ import { useFilesState } from "../../context/filesContext";
 import { usePost } from "../../hooks/usePost";
 import { colsAntdFormat } from "../../utils/tables";
 import { Heatmap, Line } from "@ant-design/plots";
+import { parseObjKeys } from "../../utils/json";
 
 const TreeAnalysis = ({ xVariables, yVariable, algorithm }) => {
 	const filesState = useFilesState();
 	var sendData = new FormData();
 	sendData.append("file", filesState.files[filesState.fileSelected]);
-	const [data, isLoading, error] = usePost("/api/pca", sendData);
-	console.log(data);
-	const { Title } = Typography;
+	sendData.append("xVariables", JSON.stringify(xVariables));
+	sendData.append("yVariable", JSON.stringify(yVariable));
+	sendData.append("algorithm", JSON.stringify(algorithm));
+	const [data, isLoading, error] = usePost("/api/components", sendData);
+	// console.log(data["modelStatsDecision"]["cols_importance"]);
+	const { Title, Text } = Typography;
 
 	// Make code reusable!!!! , also conditional rerendering
 	return (
@@ -27,42 +31,38 @@ const TreeAnalysis = ({ xVariables, yVariable, algorithm }) => {
 				/>
 			) : (
 				<>
-					{data["table"].length > 0 && (
+					<Title level={1}>Arbol de decision</Title>
+					<Title level={2}>Metodo</Title>
+					<Text>{data["modelStatsDecision"]["criteria"]}</Text>
+					<Divider />
+					{data["modelStatsDecision"]["cols_importance"] && (
 						<CustomTable
-							data={data["table"]}
-							columns={colsAntdFormat(data["table"])}
-							title="Datos"
+							data={JSON.parse(data["modelStatsDecision"]["cols_importance"])}
+							columns={colsAntdFormat(
+								JSON.parse(data["modelStatsDecision"]["cols_importance"])
+							)}
+							title="Importancia de las variables"
 						/>
 					)}
-					{data["description"].length > 0 && (
+					<Divider />
+					<Title level={2}>Exactictud del modelo</Title>
+					<Text>{data["modelStatsDecision"]["accuracy"]}</Text>
+					<Title level={1}>Bosque de decision</Title>
+					<Title level={2}>Metodo</Title>
+					<Text>{data["modelStatsRandom"]["criteria"]}</Text>
+					<Divider />
+					{data["modelStatsRandom"]["cols_importance"] && (
 						<CustomTable
-							data={data["description"]}
-							columns={colsAntdFormat(data["description"])}
-							title="Informacion general"
+							data={JSON.parse(data["modelStatsRandom"]["cols_importance"])}
+							columns={colsAntdFormat(
+								JSON.parse(data["modelStatsRandom"]["cols_importance"])
+							)}
+							title="Importancia de las variables"
 						/>
 					)}
-
-					{data["corrTable"].length > 0 && (
-						<CustomTable
-							data={data["corrTable"]}
-							columns={colsAntdFormat(data["corrTable"])}
-							title="Tabla de Correlacion"
-						/>
-					)}
-					{data["heatMap"].length > 0 && (
-						<>
-							<Title level={2}>Mapa de calor</Title>
-							<Divider />
-							<Heatmap
-								autoFit
-								data={data["heatMap"]}
-								xField="col"
-								yField="row"
-								colorField="value"
-								color={["#174c83", "#7eb6d4", "#efefeb", "#efa759", "#9b4d16"]}
-							/>
-						</>
-					)}
+					<Divider />
+					<Title level={2}>Exactictud del modelo</Title>
+					<Text>{data["modelStatsRandom"]["accuracy"]}</Text>
 				</>
 			)}
 		</>

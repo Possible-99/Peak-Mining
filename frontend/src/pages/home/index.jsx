@@ -9,7 +9,7 @@ const Home = () => {
 		<div>
 			<Space
 				direction="vertical"
-				size="large"
+				size={250}
 				style={{
 					display: "flex",
 				}}

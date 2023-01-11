@@ -8,13 +8,15 @@
 from flask import Flask , request
 from werkzeug.utils import secure_filename
 
-import general_analysis 
+import general_analysis
 from utils import read_file , numeric_cols, get_max_cols , df_to_dict , nparray_to_df, select_cols, dict_vals_to_json , df_to_json
 from pandas import read_csv
 import pca
 import eda
 import trees
 import json
+
+
 
 app = Flask(__name__)
 ALLOWED_EXTENSIONS = {'txt', 'csv', 'xlx'}
@@ -113,9 +115,10 @@ def pca_analyisis():
 
 
 
-@app.route("/api/components", methods = ["GET"])
+@app.route("/api/components", methods = ["POST"])
 def trees_analysis():
     file = proccess_file(request)
+    print(request.form)
     X_variables = json.loads(request.form['xVariables'])
     Y_variable = json.loads(request.form["yVariable"])
     algorithm = json.loads(request.form["algorithm"])
@@ -152,12 +155,12 @@ def trees_analysis():
 
 
 @app.route("/api/general_analysis", methods = ["POST"])
-def general_analysis():
+def general_stats():
     file = proccess_file(request)
     if file:
         data_frame = read_file(file)
         description = general_analysis.data_description(data_frame)
-        numeric_cols= numeric_cols(data_frame).columns
+        num_cols= list(numeric_cols(data_frame).columns)
         num_var_stats= general_analysis.numerical_variables_stats(data_frame)
         corr_table = general_analysis.corr_table(data_frame)
         heat_map = general_analysis.corr_heatmap_values(corr_table)
@@ -168,7 +171,7 @@ def general_analysis():
             "corrTable" : df_to_json(corr_table),
             "heatMap" : df_to_json(heat_map),
             "numVarStats" : df_to_json(num_var_stats),
-            "numericCols": numeric_cols 
+            "numericCols": num_cols 
         }
 
     return "try later or verify file characteristics and arguments" , 400

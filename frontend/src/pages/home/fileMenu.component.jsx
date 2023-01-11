@@ -47,7 +47,7 @@ const FileMenu = ({ title }) => {
 									md: 40,
 									lg: 64,
 									xl: 180,
-									xxl: 100,
+									xxl: 180,
 								}}
 								shape="square"
 								style={{ cursor: "pointer" }}

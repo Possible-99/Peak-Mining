@@ -38,7 +38,7 @@ const PcaAnalysis = () => {
 						<CustomTable
 							data={data["description"]}
 							columns={colsAntdFormat(data["description"])}
-							title="Informacion general"
+							title="Información general"
 						/>
 					)}
 
@@ -46,7 +46,7 @@ const PcaAnalysis = () => {
 						<CustomTable
 							data={data["corrTable"]}
 							columns={colsAntdFormat(data["corrTable"])}
-							title="Tabla de Correlacion"
+							title="Tabla de correlación"
 						/>
 					)}
 					{data["heatMap"].length > 0 && (
@@ -68,12 +68,12 @@ const PcaAnalysis = () => {
 						<CustomTable
 							data={data["standMatrix"]}
 							columns={colsAntdFormat(data["standMatrix"])}
-							title="Matriz de standarizacion"
+							title="Matriz de estandarización"
 						/>
 					)}
 					{data["compChartVals"].length > 0 && (
 						<>
-							<Title level={2}>Grafica de componentes</Title>
+							<Title level={2}>Gráfica de componentes</Title>
 							<Divider />
 							<Line
 								data={data["compChartVals"]}
@@ -96,7 +96,7 @@ const PcaAnalysis = () => {
 						<CustomTable
 							data={data["maxCols"]}
 							columns={colsAntdFormat(data["maxCols"])}
-							title="Valores Maximos en las cargas"
+							title="Valores máximos en las cargas"
 						/>
 					)}
 				</>

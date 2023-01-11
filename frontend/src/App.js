@@ -5,6 +5,7 @@ import MainLayout from "./layouts/main.layout";
 import { FilesProvider } from "./context/filesContext";
 import Eda from "./pages/eda";
 import Pca from "./pages/pca";
+import Tree from "./pages/tree";
 
 const App = () => (
 	<FilesProvider>
@@ -13,7 +14,7 @@ const App = () => (
 				<Route index element={<Home />} />
 				<Route path="eda" element={<Eda />} />
 				<Route path="pca" element={<Pca />} />
-				<Route path="comp" element={<h1>Components</h1>} />
+				<Route path="tree" element={<Tree />} />
 			</Route>
 			<Route path="*" element={<h1> Not found</h1>} />
 		</Routes>

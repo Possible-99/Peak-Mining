@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { Select as SelectAntd } from "antd";
 const Select = ({
-	mode = "multiple",
+	mode = "",
 	placeholder = "Selecciona",
 	onChange = () => console.log("error"),
 	availableOptions = [],
 	selectedItems = [],
+	style = {
+		width: "100%",
+	},
 }) => {
 	const filteredOptions = availableOptions.filter((o) => !selectedItems.includes(o));
 	return (
@@ -14,9 +17,7 @@ const Select = ({
 			placeholder={placeholder}
 			value={selectedItems}
 			onChange={onChange}
-			style={{
-				width: "100%",
-			}}
+			style={style}
 			options={filteredOptions.map((item) => ({
 				value: item,
 				label: item,

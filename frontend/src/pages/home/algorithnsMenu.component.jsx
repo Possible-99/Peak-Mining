@@ -5,7 +5,7 @@ import React from "react";
 const algorithms = [
 	{ name: "EDA", path: "/dashboard/eda" },
 	{ name: "PCA", path: "/dashboard/pca" },
-	{ name: "COMP", path: "/dashboard/comp" },
+	{ name: "COMP", path: "/dashboard/tree" },
 ];
 
 const AlgorithmsMenu = () => {
