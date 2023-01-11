@@ -7,12 +7,13 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.svm import SVC                         #Support vector classifier
 from utils import create_df
 #%matplotlib inline  
 
 
 
-tree_algorithm = {"prediction" : [DecisionTreeRegressor , RandomForestRegressor] , "classification" : [DecisionTreeClassifier , RandomForestClassifier] }
+tree_algorithm = {"prediction" : [DecisionTreeRegressor , RandomForestRegressor] , "classification" : [DecisionTreeClassifier , RandomForestClassifier] , "svm" : SVC}
 
 
 
@@ -34,8 +35,12 @@ def create_model(X , Y , test_size = 0.2):
 """
 def get_models_stats(tree_classification, Y_validation , Y_tree_classification):
     model_stats = {}
-    model_stats["criteria"] = tree_classification.criterion
-    model_stats["cols_importance"] = tree_classification.feature_importances_
+    if not isinstance(tree_classification ,SVC):
+        model_stats["criteria"] = tree_classification.criterion
+        model_stats["cols_importance"] = tree_classification.feature_importances_
+    else:
+        model_stats["supportVector"] = pd.DataFrame(tree_classification.support_vectors_)
+        
     model_stats["accuracy"] = accuracy_score(Y_validation, Y_tree_classification)
     # model_stats["report"] = classification_report(Y_validation, Y_tree_classification , output_dict = False)
     # model_stats["report"] = model_stats["report"].values()
@@ -80,7 +85,8 @@ def tree_train(model , X , tree_algorithm):
     Y_tree_classification = tree_algorithm.predict(X_validation)
     # Get stats of the model
     model_stats = get_models_stats(tree_algorithm, Y_validation, Y_tree_classification)
-    model_stats["cols_importance"] = create_df(X ,model_stats["cols_importance"])
+    if "cols_importance" in model_stats:
+        model_stats["cols_importance"] = create_df(X ,model_stats["cols_importance"])
     return [tree_algorithm , model_stats]
     
 

@@ -8,6 +8,8 @@ import {
 	UserOutlined,
 	UngroupOutlined,
 	VideoCameraOutlined,
+	DesktopOutlined,
+	GroupOutlined,
 } from "@ant-design/icons";
 import { Layout, Menu, theme } from "antd";
 import { Link, Outlet } from "react-router-dom";
@@ -73,7 +75,25 @@ const MainLayout = ({ children }) => {
 									<ApartmentOutlined />
 								</Link>
 							),
-							label: "Arboles",
+							label: "Árboles",
+						},
+						{
+							key: "5",
+							icon: (
+								<Link to="/dashboard/clustering">
+									<GroupOutlined />
+								</Link>
+							),
+							label: "Clustering",
+						},
+						{
+							key: "6",
+							icon: (
+								<Link to="/dashboard/svm">
+									<DesktopOutlined />
+								</Link>
+							),
+							label: "SVM",
 						},
 					]}
 				/>

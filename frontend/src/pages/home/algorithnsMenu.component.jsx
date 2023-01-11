@@ -6,6 +6,8 @@ const algorithms = [
 	{ name: "EDA", path: "/dashboard/eda" },
 	{ name: "PCA", path: "/dashboard/pca" },
 	{ name: "COMP", path: "/dashboard/tree" },
+	{ name: "CLUSTERING", path: "/dashboard/clustering" },
+	{ name: "SVM", path: "/dashboard/svm" },
 ];
 
 const AlgorithmsMenu = () => {

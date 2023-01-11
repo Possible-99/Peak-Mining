@@ -23,3 +23,16 @@ export function colsAntdFormat(tableArr) {
 	console.log(colsFormat);
 	return colsFormat;
 }
+
+export function dataClusters(obj) {
+	var form = [];
+
+	for (const key in obj) {
+		var name = "cluster" + key;
+		var newObj = {};
+		newObj["name"] = name;
+		newObj["count"] = obj[key];
+		form.push(newObj);
+	}
+	return form;
+}

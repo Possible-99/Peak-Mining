@@ -15,6 +15,11 @@ import pca
 import eda
 import trees
 import json
+import pandas as pd
+from sklearn.cluster import KMeans
+from kneed import KneeLocator
+import numpy as np
+
 
 
 
@@ -33,6 +38,17 @@ def proccess_file(request):
     file = request.files['file']
     if file and allowed_file(file.filename):
         return file
+
+
+def obtainNClusters(matrix):
+    SSE = []
+    for i in range(2, 12):
+        km = KMeans(n_clusters=i, random_state=0)
+        km.fit(matrix)
+        SSE.append(km.inertia_)
+    kl = KneeLocator(range(2, 12), SSE, curve="convex", direction="decreasing")
+    nClusters=kl.elbow
+    return nClusters
 
 
 @app.route("/api/eda", methods = ["POST"])
@@ -156,6 +172,73 @@ def general_stats():
         }
 
     return "try later or verify file characteristics and arguments" , 400
+
+
+@app.route("/api/clusteringParticional",methods=["POST"])
+def clusteringParticionalResultados():
+    file = proccess_file(request)
+    extension=file.filename.split(".")[1]
+    if file:
+        csvFile= pd.read_table(file).fillna(0) if extension=="txt" else pd.read_csv(file).fillna(0)
+        dataTable=csvFile.select_dtypes(include=['float64','int64'])
+        dataTableWithoutNan=fillNanWithMean(dataTable)
+        numberColumns=len(dataTableWithoutNan.columns)
+        #Procedemos a seleccionar lo que necesitamos de la tabla.
+        actualMatrix=dataTableWithoutNan.iloc[:, 0:numberColumns].values
+        #Procedemos al algoritmo de clustering jerarquico
+        MParticional =KMeans(n_clusters=obtainNClusters(actualMatrix), random_state=0).fit(actualMatrix) 
+        MParticional.predict(actualMatrix)
+        csvFile["clusterP"]=MParticional.labels_
+        #Le damos forma a la data para enviarla al front end
+        clustersQuantity=csvFile.groupby(['clusterP'])['clusterP'].count().to_dict()
+        centroidesP=MParticional.cluster_centers_
+        centroidesPDataFrame = pd.DataFrame(centroidesP.round(2), columns=list(dataTableWithoutNan))
+        centroidesPList=centroidesPDataFrame.to_dict("records")
+        csvFile=csvFile.to_dict("records")
+        # Lo pasamos como string para que no ordene automaticamente las llaves
+        return {"clustersQuantity":clustersQuantity,"centroidesH":json.dumps(centroidesPList),"tablaGeneral":json.dumps(csvFile)}
+
+    return "try later or verify file characteristics and arguments" , 400
+
+
+@app.route("/api/svm", methods = ["POST"])
+def svm():
+    file = proccess_file(request)
+    print(request.form)
+    X_variables = json.loads(request.form['xVariables'])
+    Y_variable = json.loads(request.form["yVariable"])
+    algorithm = json.loads(request.form["algorithm"])
+    if file and X_variables and Y_variable:
+        data_frame = read_file(file)
+
+        # Select variables
+        X = select_cols(data_frame ,X_variables)
+
+        Y = select_cols(data_frame, Y_variable)
+        model = trees.create_model(X, Y)
+
+        #Pick algorithm
+        svm = trees.tree_algorithm["svm"]
+        svm = svm(kernel = "linear")
+
+        decision_model, model_stats = trees.tree_train(model , X_variables , svm)
+
+
+        return {
+            "modelStatsDecision" : dict_vals_to_json(model_stats),
+        }
+
+    return "try later or verify file characteristics and arguments" , 400
+
+
+def fillNanWithMean(table):
+    if(table.isnull().values.any()):
+        for column in table:
+            table[column].fillna((table[column].mean()), inplace=True)
+        return table
+    return table
+
+
 
 def debug(data):
     print("==========================")
